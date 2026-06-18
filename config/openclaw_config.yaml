@@ -1,0 +1,25 @@
+# PAN-AI OpenClaw Configuration
+
+gateway:
+  host: "0.0.0.0"
+  port: 18789
+  security:
+    enabled: true
+    admin_password: "PANDAI_SECURE_ADMIN_PASSWORD_CHANGE_ME"
+
+provider:
+  default: "gemini"
+  gemini:
+    api_key: "YOUR_GOOGLE_GEMINI_API_KEY"
+    model: "gemini-1.5-flash"
+  ollama:
+    host: "http://localhost:11434"
+    model: "nous-hermes"
+
+paths:
+  skills_dir: "./skills"
+  memories_dir: "./memories"
+
+logging:
+  level: "INFO"
+  file: "./logs/openclaw.log"
