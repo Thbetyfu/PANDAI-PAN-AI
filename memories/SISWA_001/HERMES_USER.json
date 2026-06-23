@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-06-23T16:20:08.982632",
+  "updated_at": "2026-06-23T16:20:08.982632",
+  "learning_style": "Visual",
+  "sleep_threshold_hours": 7,
+  "baseline_heart_rate": 75,
+  "average_attention_span_minutes": 20,
+  "student_id": "SISWA_001",
+  "personality_traits": [],
+  "preferences": {},
+  "metadata": {}
+}

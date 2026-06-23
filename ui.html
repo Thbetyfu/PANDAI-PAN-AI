@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PANDAI — Language Tutor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#f6f8fc;
+        --surface:#ffffff;
+        --surface2:#fbfcff;
+        --stroke:#e6ebf4;
+        --text:#0f172a;
+        --muted:#475569;
+        --muted2:#64748b;
+        --good:#16a34a;
+        --warn:#f59e0b;
+        --bad:#ef4444;
+        --primary:#2563eb;
+        --primary2:#1d4ed8;
+        --accent:#06b6d4;
+        --shadow: 0 16px 50px rgba(15,23,42,.10);
+        --radius: 18px;
+        --radius2: 14px;
+        --ring: 0 0 0 1px var(--stroke) inset;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      }
+
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        color:var(--text);
+        background: radial-gradient(900px 700px at 18% 10%, rgba(37,99,235,.10), transparent 56%),
+                    radial-gradient(900px 700px at 85% 20%, rgba(6,182,212,.10), transparent 56%),
+                    linear-gradient(180deg, #ffffff, var(--bg));
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+        overflow:hidden;
+      }
+
+      .wrap{
+        height:100%;
+        display:grid;
+        grid-template-columns: 420px 1fr;
+        gap:18px;
+        padding:18px;
+        max-width: 1320px;
+        margin:0 auto;
+      }
+
+      @media (max-width: 980px){
+        body{overflow:auto}
+        .wrap{grid-template-columns: 1fr; height:auto; min-height:100%}
+      }
+
+      .card{
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        border:1px solid var(--stroke);
+        overflow:hidden;
+      }
+
+      .left{
+        display:flex;
+        flex-direction:column;
+        min-height: 0;
+      }
+
+      .brand{
+        padding:18px 18px 14px 18px;
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:12px;
+        border-bottom:1px solid var(--stroke);
+      }
+
+      .brand h1{
+        margin:0;
+        font-weight: 800;
+        letter-spacing:.2px;
+        font-size: 28px;
+        line-height: 1.06;
+      }
+      .brand p{
+        margin:10px 0 0 0;
+        color:var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .pill{
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        padding:8px 10px;
+        border-radius: 999px;
+        white-space:nowrap;
+      }
+
+      .mascot-zone{
+        padding:18px;
+        display:grid;
+        grid-template-rows:auto 1fr auto;
+        gap:14px;
+        min-height:0;
+      }
+
+      .mascot-frame{
+        position:relative;
+        border-radius: 18px;
+        background: radial-gradient(900px 520px at 60% 10%, rgba(37,99,235,.12), rgba(255,255,255,1));
+        box-shadow: var(--ring);
+        padding:16px;
+        min-height: 320px;
+        overflow:hidden;
+      }
+
+      .glow{
+        position:absolute; inset:-120px -140px auto auto;
+        width:420px; height:420px;
+        background: radial-gradient(circle at 30% 30%, rgba(6,182,212,.18), transparent 60%),
+                    radial-gradient(circle at 60% 70%, rgba(37,99,235,.16), transparent 60%);
+        filter: blur(18px);
+        opacity:.9;
+        pointer-events:none;
+      }
+
+      .mascot{
+        position:absolute;
+        inset:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:26px;
+      }
+
+      .mascot img{
+        width: 84%;
+        max-width: 340px;
+        height:auto;
+        filter: drop-shadow(0 22px 42px rgba(15,23,42,.16));
+        transform-origin: 50% 80%;
+        animation: float 4.6s ease-in-out infinite;
+      }
+
+      @keyframes float{
+        0%,100%{ transform: translateY(0) rotate(-.5deg) }
+        50%{ transform: translateY(-10px) rotate(.7deg) }
+      }
+
+      .speech-bubble{
+        position:absolute;
+        left:16px;
+        right:16px;
+        bottom:16px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.86);
+        border:1px solid var(--stroke);
+        padding:12px 12px;
+        display:flex;
+        gap:10px;
+        align-items:flex-start;
+        box-shadow: 0 14px 30px rgba(15,23,42,.12);
+        backdrop-filter: blur(8px);
+      }
+
+      .speech-bubble .dot{
+        width:10px; height:10px;
+        border-radius:999px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+        margin-top:4px;
+        flex:none;
+      }
+
+      .speech-bubble .text{
+        font-size: 13px;
+        line-height: 1.35;
+        color: var(--text);
+        max-height: 4.2em;
+        overflow:hidden;
+        display:-webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      .controls{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:10px;
+      }
+
+      .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+      }
+
+      label{
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      input, select{
+        width:100%;
+        border-radius: 14px;
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        color: var(--text);
+        padding: 11px 12px;
+        outline:none;
+        font-size: 13px;
+      }
+      input:focus, select:focus{
+        box-shadow: 0 0 0 3px rgba(37,99,235,.18);
+        border-color: rgba(37,99,235,.45);
+      }
+
+      .btnrow{
+        display:flex;
+        gap:10px;
+        margin-top: 4px;
+      }
+
+      button{
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 14px;
+        cursor:pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      }
+      button:hover{ transform: translateY(-1px); background: #ffffff }
+      button:active{ transform: translateY(0px); background: var(--surface2) }
+
+      .btn-primary{
+        background: linear-gradient(135deg, var(--primary), var(--primary2));
+        border-color: rgba(37,99,235,.45);
+        color: #ffffff;
+      }
+
+      .btn-ghost{
+        background: rgba(37,99,235,.08);
+      }
+
+      .toggle{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:10px 12px;
+        border-radius: 14px;
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        user-select:none;
+      }
+
+      .switch{
+        width: 42px;
+        height: 24px;
+        border-radius: 999px;
+        border:1px solid var(--stroke);
+        background: rgba(15,23,42,.06);
+        position:relative;
+        flex:none;
+      }
+      .switch::after{
+        content:"";
+        position:absolute;
+        top:2px; left:2px;
+        width: 18px; height:18px;
+        border-radius:999px;
+        background: #ffffff;
+        box-shadow: 0 8px 18px rgba(15,23,42,.14);
+        transition: transform .15s ease, background .15s ease;
+      }
+      .toggle[data-on="true"] .switch{
+        background: rgba(37,99,235,.22);
+        border-color: rgba(37,99,235,.30);
+      }
+      .toggle[data-on="true"] .switch::after{
+        transform: translateX(18px);
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+      }
+
+      .toggle span{
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .right{
+        display:flex;
+        flex-direction:column;
+        min-height:0;
+      }
+
+      .chat-head{
+        padding:18px;
+        border-bottom:1px solid var(--stroke);
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+      }
+
+      .chat-head .title{
+        display:flex;
+        gap:10px;
+        align-items:baseline;
+      }
+      .chat-head .title h2{
+        margin:0;
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: .2px;
+      }
+      .chat-head .title small{
+        color: var(--muted2);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+
+      .chat{
+        padding: 18px;
+        overflow:auto;
+        flex: 1 1 auto;
+      }
+
+      .msg{
+        display:flex;
+        margin: 10px 0;
+      }
+      .msg.user{ justify-content:flex-end }
+      .msg.ai{ justify-content:flex-start }
+
+      .bubble{
+        max-width: 720px;
+        border-radius: 18px;
+        padding: 12px 12px;
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        box-shadow: 0 10px 24px rgba(15,23,42,.08);
+      }
+      .user .bubble{
+        background: linear-gradient(135deg, rgba(37,99,235,.14), rgba(6,182,212,.10));
+        border-color: rgba(37,99,235,.20);
+      }
+      .ai .bubble{
+        background: #ffffff;
+      }
+
+      .bubble .meta{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom: 8px;
+        color: var(--muted2);
+        font-size: 11px;
+        font-family: var(--mono);
+      }
+      .bubble .meta .tag{
+        border:1px solid var(--stroke);
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--surface2);
+      }
+
+      .bubble .content{
+        white-space: pre-wrap;
+        line-height: 1.45;
+        font-size: 13px;
+      }
+
+      .bubble .extra{
+        margin-top: 10px;
+        border-top: 1px solid var(--stroke);
+        padding-top: 10px;
+        display:grid;
+        gap:8px;
+      }
+      .kv{
+        display:grid;
+        grid-template-columns: 120px 1fr;
+        gap:10px;
+        font-size: 12px;
+      }
+      .kv b{
+        color: var(--text);
+        font-weight: 600;
+      }
+      .kv div{
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+
+      .composer{
+        padding: 14px 18px 18px 18px;
+        border-top:1px solid var(--stroke);
+        display:grid;
+        grid-template-columns: 1fr auto auto;
+        gap:10px;
+        align-items:end;
+      }
+
+      textarea{
+        width:100%;
+        min-height: 52px;
+        max-height: 150px;
+        resize: vertical;
+        border-radius: 16px;
+        border:1px solid var(--stroke);
+        background: var(--surface2);
+        color: var(--text);
+        padding: 12px 12px;
+        outline:none;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      textarea:focus{
+        box-shadow: 0 0 0 3px rgba(37,99,235,.18);
+        border-color: rgba(37,99,235,.45);
+      }
+
+      .mini{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        align-items:stretch;
+      }
+
+      .status{
+        font-size: 11px;
+        color: var(--muted2);
+        font-family: var(--mono);
+      }
+
+      .badge{
+        display:inline-flex;
+        gap:8px;
+        align-items:center;
+      }
+      .dot2{
+        width:8px; height:8px;
+        border-radius:999px;
+        background: rgba(15,23,42,.35);
+      }
+      .dot2.good{ background: var(--good) }
+      .dot2.warn{ background: var(--warn) }
+      .dot2.bad{ background: var(--bad) }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="card left">
+        <div class="brand">
+          <div>
+            <h1>PANDAI</h1>
+            <p>Mode: Language Tutor. Maskot + chat + suara (TTS) + rekam (STT).</p>
+          </div>
+          <div class="pill">API: :3004</div>
+        </div>
+
+        <div class="mascot-zone">
+          <div class="mascot-frame">
+            <div class="glow"></div>
+            <div class="mascot">
+              <img id="mascotImg" alt="Maskot PANDAI" src="/api/mascot/siswa/Menyapa" />
+            </div>
+            <div class="speech-bubble" aria-live="polite">
+              <div class="dot"></div>
+              <div class="text" id="mascotLine">Halo! Aku siap jadi teman belajar bahasamu.</div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="studentId">Student ID</label>
+              <input id="studentId" value="SISWA_001" placeholder="mis. SISWA_001" />
+            </div>
+            <div class="field">
+              <label for="language">Bahasa</label>
+              <select id="language">
+                <option value="English" selected>English</option>
+                <option value="Indonesian">Indonesian</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="llmMode">LLM Mode</label>
+              <select id="llmMode">
+                <option value="local" selected>GPU Local (Ollama)</option>
+                <option value="api">Cloud API (OpenAI-compatible)</option>
+                <option value="auto">Auto (local → api)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="llmInfo">Info</label>
+              <input id="llmInfo" value="Checking…" readonly />
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="ttsMode">TTS Mode</label>
+              <select id="ttsMode">
+                <option value="local" selected>Local Voice</option>
+                <option value="api">Cloud Voice (API)</option>
+                <option value="auto">Auto (local → api)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ttsInfo">Voice Info</label>
+              <input id="ttsInfo" value="Checking…" readonly />
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <div class="toggle" id="autoSpeak" data-on="true" role="switch" aria-checked="true" tabindex="0">
+              <div class="switch" aria-hidden="true"></div>
+              <span>Auto Speak</span>
+            </div>
+            <button class="btn-ghost" id="btnClear">New Session</button>
+            <button class="btn-primary" id="btnSpeakLast">Speak</button>
+          </div>
+
+          <div class="status" id="leftStatus">
+            <span class="badge"><span class="dot2 warn"></span>Siap</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card right">
+        <div class="chat-head">
+          <div class="title">
+            <h2>Chat</h2>
+            <small id="sessionLabel">SISWA_001</small>
+          </div>
+          <button class="btn-ghost" id="btnPing">Cek API</button>
+        </div>
+
+        <div class="chat" id="chat"></div>
+
+        <div class="composer">
+          <textarea id="input" placeholder="Ketik pesan… (Enter untuk kirim, Shift+Enter untuk baris baru)"></textarea>
+          <div class="mini">
+            <button id="btnMic" class="btn-ghost">Mic</button>
+            <div class="status" id="micStatus"><span class="badge"><span class="dot2"></span>STT idle</span></div>
+          </div>
+          <button class="btn-primary" id="btnSend">Kirim</button>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const chatEl = $("chat");
+      const inputEl = $("input");
+      const studentIdEl = $("studentId");
+      const languageEl = $("language");
+      const llmModeEl = $("llmMode");
+      const llmInfoEl = $("llmInfo");
+      const ttsModeEl = $("ttsMode");
+      const ttsInfoEl = $("ttsInfo");
+      const mascotImg = $("mascotImg");
+      const mascotLine = $("mascotLine");
+      const leftStatus = $("leftStatus");
+      const sessionLabel = $("sessionLabel");
+      const autoSpeak = $("autoSpeak");
+      const micStatus = $("micStatus");
+
+      let lastAssistantText = "";
+      let recording = false;
+      let mediaRecorder = null;
+      let recordedChunks = [];
+
+      function setLeftStatus(kind, text){
+        const cls = kind === "good" ? "good" : kind === "bad" ? "bad" : "warn";
+        leftStatus.innerHTML = `<span class="badge"><span class="dot2 ${cls}"></span>${escapeHtml(text)}</span>`;
+      }
+
+      function escapeHtml(str){
+        return String(str)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll("\"","&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function addMsg(role, content, extra){
+        const time = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+        const tag = role === "user" ? "YOU" : "PANDAI";
+        const extraHtml = extra ? `
+          <div class="extra">
+            ${extra.correction ? `<div class="kv"><b>Correction</b><div>${escapeHtml(extra.correction)}</div></div>` : ""}
+            ${extra.explanation ? `<div class="kv"><b>Explanation</b><div>${escapeHtml(extra.explanation)}</div></div>` : ""}
+          </div>
+        ` : "";
+
+        const el = document.createElement("div");
+        el.className = `msg ${role}`;
+        el.innerHTML = `
+          <div class="bubble">
+            <div class="meta">
+              <span class="tag">${tag}</span>
+              <span>${time}</span>
+            </div>
+            <div class="content">${escapeHtml(content)}</div>
+            ${extraHtml}
+          </div>
+        `;
+        chatEl.appendChild(el);
+        chatEl.scrollTop = chatEl.scrollHeight;
+      }
+
+      function getStudentId(){
+        const v = studentIdEl.value.trim();
+        return v.length ? v : "SISWA_001";
+      }
+
+      function getLanguage(){
+        return languageEl.value || "English";
+      }
+
+      function getLlmMode(){
+        const v = llmModeEl ? llmModeEl.value : "local";
+        return v || "local";
+      }
+
+      function getTtsMode(){
+        const v = ttsModeEl ? ttsModeEl.value : "local";
+        return v || "local";
+      }
+
+      function setSessionLabel(){
+        sessionLabel.textContent = getStudentId();
+      }
+
+      async function refreshLlmStatus(){
+        if(!llmInfoEl) return;
+        try{
+          const res = await fetch("/api/config/llm");
+          if(!res.ok) throw new Error("cfg");
+          const cfg = await res.json();
+          const mode = getLlmMode();
+          const ollamaOk = !!(cfg && cfg.ollama && cfg.ollama.available);
+          const ollamaModel = (cfg && cfg.ollama && cfg.ollama.model) ? String(cfg.ollama.model) : "";
+          const apiKeyOk = !!(cfg && cfg.openai_compatible && cfg.openai_compatible.has_api_key);
+          const apiModel = (cfg && cfg.openai_compatible && cfg.openai_compatible.model) ? String(cfg.openai_compatible.model) : "";
+
+          if(mode === "local"){
+            llmInfoEl.value = ollamaOk ? `Ollama OK (${ollamaModel})` : "Ollama tidak terdeteksi (fallback)";
+            return;
+          }
+          if(mode === "api"){
+            llmInfoEl.value = apiKeyOk ? `API OK (${apiModel})` : "Belum ada OPENAI_API_KEY (fallback)";
+            return;
+          }
+          llmInfoEl.value = ollamaOk ? `Auto: Ollama OK (${ollamaModel})` : (apiKeyOk ? `Auto: API OK (${apiModel})` : "Auto: tidak ada LLM (fallback)");
+        }catch(e){
+          llmInfoEl.value = "LLM info tidak tersedia";
+        }
+      }
+
+      async function refreshTtsStatus(){
+        if(!ttsInfoEl) return;
+        try{
+          const res = await fetch("/api/config/llm");
+          if(!res.ok) throw new Error("cfg");
+          const cfg = await res.json();
+          const tts = cfg && cfg.tts ? cfg.tts : null;
+          const mode = getTtsMode();
+          const localOk = !!(tts && tts.local && tts.local.available);
+          const apiOk = !!(tts && tts.api && tts.api.configured);
+          const localProvider = (tts && tts.local && tts.local.provider) ? String(tts.local.provider) : "local";
+          const apiProvider = (tts && tts.api && tts.api.provider) ? String(tts.api.provider) : "api";
+
+          if(mode === "local"){
+            ttsInfoEl.value = localOk ? `Local OK (${localProvider})` : "Local voice belum siap";
+            return;
+          }
+          if(mode === "api"){
+            ttsInfoEl.value = apiOk ? `API OK (${apiProvider})` : "API voice belum dikonfigurasi";
+            return;
+          }
+          ttsInfoEl.value = localOk ? `Auto: Local OK (${localProvider})` : (apiOk ? `Auto: API OK (${apiProvider})` : "Auto: voice belum siap");
+        }catch(e){
+          ttsInfoEl.value = "Voice info tidak tersedia";
+        }
+      }
+
+      async function apiPostJson(path, body){
+        const res = await fetch(path, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(body)
+        });
+        if(!res.ok){
+          const txt = await res.text().catch(()=>"");
+          throw new Error(`HTTP ${res.status} ${txt}`.trim());
+        }
+        const ct = res.headers.get("content-type") || "";
+        if(ct.includes("application/json")) return await res.json();
+        return await res.text();
+      }
+
+      async function apiDelete(path){
+        const res = await fetch(path, {method:"DELETE"});
+        if(!res.ok){
+          const txt = await res.text().catch(()=>"");
+          throw new Error(`HTTP ${res.status} ${txt}`.trim());
+        }
+        return await res.json().catch(()=>({success:true}));
+      }
+
+      async function setMascotByFeedback(feedbackType){
+        try{
+          const payload = {context:"chat", cognitive_state:null, feedback_type:feedbackType};
+          const r = await apiPostJson("/api/skills/mascot/expression", payload);
+          const exp = r.mascot_expression || "Happy";
+          mascotImg.src = `/api/mascot/siswa/${encodeURIComponent(exp)}`;
+        }catch(e){}
+      }
+
+      async function playTts(text){
+        const lang = getLanguage() === "English" ? "en" : "id";
+        setLeftStatus("warn","TTS…");
+        const res = await fetch("/api/language-tutor/text-to-speech", {
+          method:"POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({text, language: lang, tts_mode: getTtsMode()})
+        });
+        if(!res.ok){
+          setLeftStatus("bad","TTS gagal");
+          return;
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => URL.revokeObjectURL(url);
+        await audio.play().catch(()=>{});
+        setLeftStatus("good","Siap");
+      }
+
+      async function sendMessage(){
+        const content = inputEl.value.trim();
+        if(!content) return;
+        setSessionLabel();
+        addMsg("user", content);
+        inputEl.value = "";
+        mascotLine.textContent = "Aku dengar…";
+        setLeftStatus("warn","Memproses…");
+
+        try{
+          const payload = {
+            student_id: getStudentId(),
+            content,
+            language: getLanguage(),
+            llm_mode: getLlmMode()
+          };
+          const r = await apiPostJson("/api/skills/language-tutor/chat", payload);
+          const assistant = r.assistant_message || r.response || r.message || "";
+          const correction = r.correction || null;
+          const explanation = r.explanation || null;
+          lastAssistantText = assistant;
+          addMsg("ai", assistant, {correction, explanation});
+          mascotLine.textContent = assistant || "…";
+          setLeftStatus("good","Siap");
+
+          const feedbackType = correction ? "constructive" : "positive";
+          await setMascotByFeedback(feedbackType);
+
+          const on = autoSpeak.getAttribute("data-on") === "true";
+          if(on && assistant){
+            await playTts(assistant);
+          }
+        }catch(e){
+          setLeftStatus("bad","Error API");
+          mascotLine.textContent = "Aku gagal memproses. Coba lagi ya.";
+          await setMascotByFeedback("neutral");
+          addMsg("ai", `Error: ${String(e.message || e)}`);
+        }
+      }
+
+      function toggleAutoSpeak(){
+        const on = autoSpeak.getAttribute("data-on") === "true";
+        autoSpeak.setAttribute("data-on", on ? "false" : "true");
+        autoSpeak.setAttribute("aria-checked", on ? "false" : "true");
+      }
+
+      async function clearSession(){
+        const sid = getStudentId();
+        setLeftStatus("warn","Menghapus…");
+        try{
+          await apiDelete(`/api/skills/language-tutor/history/${encodeURIComponent(sid)}`);
+        }catch(e){}
+        chatEl.innerHTML = "";
+        lastAssistantText = "";
+        mascotLine.textContent = "Session baru. Kita mulai dari nol.";
+        mascotImg.src = "/api/mascot/siswa/Menyapa";
+        setLeftStatus("good","Siap");
+      }
+
+      async function pingApi(){
+        setLeftStatus("warn","Cek…");
+        try{
+          const res = await fetch("/api/mascot/siswa/expressions");
+          if(!res.ok) throw new Error("Ping failed");
+          setLeftStatus("good","API OK");
+        }catch(e){
+          setLeftStatus("bad","API Down");
+        }
+      }
+
+      async function micToggle(){
+        if(recording){
+          mediaRecorder.stop();
+          return;
+        }
+        if(!navigator.mediaDevices || !window.MediaRecorder){
+          micStatus.innerHTML = `<span class="badge"><span class="dot2 bad"></span>Browser tidak mendukung</span>`;
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => {
+          if(e.data && e.data.size > 0) recordedChunks.push(e.data);
+        };
+        mediaRecorder.onstop = async () => {
+          recording = false;
+          $("btnMic").textContent = "Mic";
+          micStatus.innerHTML = `<span class="badge"><span class="dot2 warn"></span>Transcribing…</span>`;
+          stream.getTracks().forEach(t => t.stop());
+
+          try{
+            const blob = new Blob(recordedChunks, {type: recordedChunks[0]?.type || "audio/webm"});
+            const file = new File([blob], "recording.webm", {type: blob.type});
+            const form = new FormData();
+            form.append("file", file);
+            const lang = getLanguage() === "English" ? "en" : "id";
+            const res = await fetch(`/api/language-tutor/speech-to-text?language=${encodeURIComponent(lang)}`, {
+              method:"POST",
+              body: form
+            });
+            if(!res.ok){
+              const t = await res.text().catch(()=>"");
+              throw new Error(`STT HTTP ${res.status} ${t}`.trim());
+            }
+            const data = await res.json();
+            const text = (data && data.text) ? String(data.text) : "";
+            inputEl.value = text;
+            micStatus.innerHTML = `<span class="badge"><span class="dot2 good"></span>STT siap</span>`;
+          }catch(e){
+            micStatus.innerHTML = `<span class="badge"><span class="dot2 bad"></span>STT gagal</span>`;
+          }
+        };
+
+        recording = true;
+        $("btnMic").textContent = "Stop";
+        micStatus.innerHTML = `<span class="badge"><span class="dot2 bad"></span>Recording…</span>`;
+        mediaRecorder.start();
+      }
+
+      $("btnSend").addEventListener("click", sendMessage);
+      inputEl.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" && !e.shiftKey){
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      studentIdEl.addEventListener("change", setSessionLabel);
+      languageEl.addEventListener("change", () => {
+        setSessionLabel();
+        setLeftStatus("good","Siap");
+      });
+      if(llmModeEl){
+        llmModeEl.addEventListener("change", () => {
+          setLeftStatus("good","Siap");
+          refreshLlmStatus().catch(()=>{});
+        });
+      }
+      if(ttsModeEl){
+        ttsModeEl.addEventListener("change", () => {
+          setLeftStatus("good","Siap");
+          refreshTtsStatus().catch(()=>{});
+        });
+      }
+
+      autoSpeak.addEventListener("click", toggleAutoSpeak);
+      autoSpeak.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          toggleAutoSpeak();
+        }
+      });
+
+      $("btnSpeakLast").addEventListener("click", async () => {
+        if(lastAssistantText) await playTts(lastAssistantText);
+      });
+      $("btnClear").addEventListener("click", clearSession);
+      $("btnPing").addEventListener("click", pingApi);
+      $("btnMic").addEventListener("click", micToggle);
+
+      setSessionLabel();
+      setLeftStatus("good","Siap");
+      refreshLlmStatus().catch(()=>{});
+      refreshTtsStatus().catch(()=>{});
+    </script>
+  </body>
+</html>

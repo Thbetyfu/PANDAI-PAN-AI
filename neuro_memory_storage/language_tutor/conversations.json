@@ -1,0 +1,102 @@
+{
+  "SISWA_001": [
+    {
+      "role": "user",
+      "content": "halo",
+      "timestamp": "2026-06-23T14:37:07.132661",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! You said: 'halo'. I'm your English tutor! (Ollama not available, using fallback)",
+      "timestamp": "2026-06-23T14:37:11.246859",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "halllo",
+      "timestamp": "2026-06-23T14:38:15.658591",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! You said: 'halllo'. I'm your English tutor! (Ollama not available, using fallback)",
+      "timestamp": "2026-06-23T14:38:19.720993",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "hallo",
+      "timestamp": "2026-06-23T14:45:31.089356",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! You said: 'hallo'. I'm your English tutor! (No LLM configured, using fallback)",
+      "timestamp": "2026-06-23T14:45:35.183545",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "hallo",
+      "timestamp": "2026-06-23T16:20:09.276438",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! You said: 'hallo'. I'm your English tutor! (No LLM configured, using fallback)",
+      "timestamp": "2026-06-23T16:20:13.346050",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "hallo",
+      "timestamp": "2026-06-23T16:45:18.471400",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! You said: 'hallo'. I'm your English tutor! (No LLM configured, using fallback)",
+      "timestamp": "2026-06-23T16:45:22.584002",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "hallo",
+      "timestamp": "2026-06-23T19:28:27.612224",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Thanks for your message. Let's practice English together!",
+      "timestamp": "2026-06-23T19:28:27.687143",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "user",
+      "content": "hallo",
+      "timestamp": "2026-06-23T19:28:36.632936",
+      "correction": null,
+      "explanation": null
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Thanks for your message. Let's practice English together!",
+      "timestamp": "2026-06-23T19:28:36.678359",
+      "correction": null,
+      "explanation": null
+    }
+  ]
+}

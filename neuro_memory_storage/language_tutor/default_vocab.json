@@ -1,0 +1,37 @@
+[
+  {
+    "word": "Hello",
+    "translation": "Halo",
+    "example_sentence": "Hello, how are you?",
+    "difficulty": "beginner",
+    "topic": "Greetings"
+  },
+  {
+    "word": "Goodbye",
+    "translation": "Selamat tinggal",
+    "example_sentence": "Goodbye, see you tomorrow!",
+    "difficulty": "beginner",
+    "topic": "Greetings"
+  },
+  {
+    "word": "Thank you",
+    "translation": "Terima kasih",
+    "example_sentence": "Thank you for your help.",
+    "difficulty": "beginner",
+    "topic": "Greetings"
+  },
+  {
+    "word": "Cat",
+    "translation": "Kucing",
+    "example_sentence": "I have a black cat.",
+    "difficulty": "beginner",
+    "topic": "Animals"
+  },
+  {
+    "word": "Dog",
+    "translation": "Anjing",
+    "example_sentence": "The dog is very friendly.",
+    "difficulty": "beginner",
+    "topic": "Animals"
+  }
+]
