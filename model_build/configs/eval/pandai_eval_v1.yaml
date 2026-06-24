@@ -1,0 +1,29 @@
+benchmark:
+  name: "PANDAI-EVAL"
+  version: "v1"
+  output_dir: "model_build/artifacts/eval_reports/pandai_eval_v1"
+
+subsets:
+  - "eval_id_tutor_basic"
+  - "eval_en_tutor_basic"
+  - "eval_bilingual_switch"
+  - "eval_grammar_fix"
+  - "eval_quiz_json"
+  - "eval_safe_refusal"
+  - "eval_short_vs_detailed_response"
+
+metrics:
+  - "json_valid_rate"
+  - "bilingual_instruction_success"
+  - "grammar_acceptance"
+  - "critical_hallucination_rate"
+  - "latency_median_ms"
+
+thresholds:
+  json_valid_rate: 0.95
+  bilingual_instruction_success: 0.90
+  grammar_acceptance: 0.85
+  critical_hallucination_rate_max: 0.03
+
+notes:
+  - "Template benchmark internal untuk evaluasi awal model PANDAI."

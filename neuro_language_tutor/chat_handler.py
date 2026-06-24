@@ -77,7 +77,9 @@ class LanguageChatHandler:
         teacher_context: Optional[str] = None,
         teacher_persona: str = "strict_warm",
         correction_mode: str = "fluency_first",
-        llm_mode: str = "auto"
+        llm_mode: str = "auto",
+        llm_profile: Optional[str] = None,
+        llm_model: Optional[str] = None
     ) -> ChatMessage:
         """
         Generate response AI menggunakan LLM, beserta koreksi dan penjelasan.
@@ -92,7 +94,9 @@ class LanguageChatHandler:
             teacher_context=teacher_context,
             teacher_persona=teacher_persona,
             correction_mode=correction_mode,
-            llm_mode=llm_mode
+            llm_mode=llm_mode,
+            llm_profile=llm_profile,
+            llm_model=llm_model
         )
         
         # Tambahkan ke riwayat dan kembalikan

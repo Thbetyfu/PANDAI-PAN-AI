@@ -30,7 +30,9 @@ def language_chat(
     teacher_context: Optional[str] = None,
     teacher_persona: str = "strict_warm",
     correction_mode: str = "fluency_first",
-    llm_mode: str = "auto"
+    llm_mode: str = "auto",
+    llm_profile: Optional[str] = None,
+    llm_model: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     OpenClaw skill: Interactive language chat with AI tutor.
@@ -54,7 +56,9 @@ def language_chat(
         teacher_context=teacher_context,
         teacher_persona=teacher_persona,
         correction_mode=correction_mode,
-        llm_mode=llm_mode
+        llm_mode=llm_mode,
+        llm_profile=llm_profile,
+        llm_model=llm_model
     )
     
     return {
@@ -69,6 +73,8 @@ def language_chat(
         "teacher_persona": teacher_persona,
         "correction_mode": correction_mode,
         "llm_mode": llm_mode,
+        "llm_profile": llm_profile or "balanced",
+        "llm_model": llm_model or "auto",
         "timestamp": timestamp
     }
 

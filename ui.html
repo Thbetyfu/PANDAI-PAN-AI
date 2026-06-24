@@ -513,6 +513,48 @@
 
           <div class="controls">
             <div class="field">
+              <label for="llmProfile">Local Profile</label>
+              <select id="llmProfile">
+                <option value="lite">Lite</option>
+                <option value="balanced" selected>Balanced</option>
+                <option value="quality">Quality</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="llmProfileInfo">Profile Info</label>
+              <input id="llmProfileInfo" value="Checking…" readonly />
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="llmModel">Local Model Override</label>
+              <select id="llmModel">
+                <option value="">Auto by profile</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="llmModelInfo">Model Info</label>
+              <input id="llmModelInfo" value="Checking…" readonly />
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="llmHealthInfo">Local Health</label>
+              <input id="llmHealthInfo" value="Checking…" readonly />
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field" style="grid-column:1 / -1;">
+              <label for="llmDebugInfo">Local Debug</label>
+              <textarea id="llmDebugInfo" rows="4" readonly style="resize:vertical; min-height:96px;">Checking…</textarea>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
               <label for="ttsMode">TTS Mode</label>
               <select id="ttsMode">
                 <option value="local" selected>Local Voice</option>
@@ -570,7 +612,13 @@
       const studentIdEl = $("studentId");
       const languageEl = $("language");
       const llmModeEl = $("llmMode");
+      const llmProfileEl = $("llmProfile");
+      const llmModelEl = $("llmModel");
       const llmInfoEl = $("llmInfo");
+      const llmProfileInfoEl = $("llmProfileInfo");
+      const llmModelInfoEl = $("llmModelInfo");
+      const llmHealthInfoEl = $("llmHealthInfo");
+      const llmDebugInfoEl = $("llmDebugInfo");
       const ttsModeEl = $("ttsMode");
       const ttsInfoEl = $("ttsInfo");
       const mascotImg = $("mascotImg");
@@ -639,6 +687,16 @@
         return v || "local";
       }
 
+      function getLlmProfile(){
+        const v = llmProfileEl ? llmProfileEl.value : "balanced";
+        return v || "balanced";
+      }
+
+      function getLlmModel(){
+        const v = llmModelEl ? llmModelEl.value : "";
+        return v || "";
+      }
+
       function getTtsMode(){
         const v = ttsModeEl ? ttsModeEl.value : "local";
         return v || "local";
@@ -649,16 +707,89 @@
       }
 
       async function refreshLlmStatus(){
-        if(!llmInfoEl) return;
+        if(!llmInfoEl || !llmProfileInfoEl || !llmModelInfoEl || !llmHealthInfoEl || !llmDebugInfoEl) return;
         try{
-          const res = await fetch("/api/config/llm");
-          if(!res.ok) throw new Error("cfg");
-          const cfg = await res.json();
+          const [cfgRes, healthRes] = await Promise.all([
+            fetch("/api/config/llm"),
+            fetch(`/api/status/local-llm?llm_profile=${encodeURIComponent(getLlmProfile())}&model_name=${encodeURIComponent(getLlmModel())}`)
+          ]);
+          if(!cfgRes.ok) throw new Error("cfg");
+          if(!healthRes.ok) throw new Error("health");
+          const cfg = await cfgRes.json();
+          const health = await healthRes.json();
           const mode = getLlmMode();
           const ollamaOk = !!(cfg && cfg.ollama && cfg.ollama.available);
           const ollamaModel = (cfg && cfg.ollama && cfg.ollama.model) ? String(cfg.ollama.model) : "";
           const apiKeyOk = !!(cfg && cfg.openai_compatible && cfg.openai_compatible.has_api_key);
           const apiModel = (cfg && cfg.openai_compatible && cfg.openai_compatible.model) ? String(cfg.openai_compatible.model) : "";
+          const profiles = (cfg && cfg.local_profiles) ? cfg.local_profiles : {};
+          const recommendedProfile = (cfg && cfg.recommended_local_profile) ? String(cfg.recommended_local_profile) : "balanced";
+          const deviceRecommendation = (cfg && cfg.device_recommendation) ? cfg.device_recommendation : null;
+          const lastWarmup = (cfg && cfg.last_warmup) ? cfg.last_warmup : null;
+          const lastActivity = (cfg && cfg.last_activity) ? cfg.last_activity : null;
+          const modelCatalog = (cfg && cfg.model_catalog) ? cfg.model_catalog : null;
+          const selectedProfileName = getLlmProfile();
+          const selectedProfile = profiles[selectedProfileName] || profiles[recommendedProfile] || null;
+          const installedModels = modelCatalog && Array.isArray(modelCatalog.installed_models) ? modelCatalog.installed_models : [];
+          const selectedModelName = getLlmModel();
+
+          if(llmProfileEl && profiles[recommendedProfile] && !llmProfileEl.dataset.bootstrapped){
+            llmProfileEl.value = recommendedProfile;
+            llmProfileEl.dataset.bootstrapped = "true";
+          }
+
+          if(selectedProfile){
+            llmProfileInfoEl.value = `${selectedProfile.label} -> ${selectedProfile.model}`;
+          }else{
+            llmProfileInfoEl.value = "Profile lokal tidak tersedia";
+          }
+
+          if(llmModelEl){
+            const currentValue = selectedModelName;
+            const options = ['<option value="">Auto by profile</option>']
+              .concat(installedModels.map((item) => {
+                const name = item && item.name ? String(item.name) : "";
+                return name ? `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>` : "";
+              }))
+              .join("");
+            llmModelEl.innerHTML = options;
+            if(currentValue && installedModels.some((item) => item && item.name === currentValue)){
+              llmModelEl.value = currentValue;
+            }else{
+              llmModelEl.value = "";
+            }
+          }
+
+          if(selectedModelName){
+            const selectedModelMeta = installedModels.find((item) => item && item.name === selectedModelName);
+            llmModelInfoEl.value = selectedModelMeta ? `Manual -> ${selectedModelName}` : "Model manual tidak terpasang";
+          }else{
+            llmModelInfoEl.value = selectedProfile ? `Auto -> ${selectedProfile.model}` : "Auto model tidak tersedia";
+          }
+
+          const localRuntime = (health && health.local_llm) ? health.local_llm : null;
+          if(localRuntime){
+            const localStatus = health.status === "ready" ? "Ready" : "Unavailable";
+            const localModel = localRuntime.active_model ? String(localRuntime.active_model) : "-";
+            const tier = deviceRecommendation && deviceRecommendation.device_tier ? String(deviceRecommendation.device_tier) : "unknown";
+            const warmupState = lastWarmup && lastWarmup.success ? "warm" : "cold";
+            const activityProvider = lastActivity && lastActivity.provider ? String(lastActivity.provider) : "idle";
+            llmHealthInfoEl.value = `${localStatus} | ${tier} | ${warmupState} | ${activityProvider} -> ${localModel}`;
+            const installedCount = modelCatalog && Array.isArray(modelCatalog.installed_model_names) ? modelCatalog.installed_model_names.length : 0;
+            const lastLatency = lastActivity && lastActivity.latency_ms != null ? `${lastActivity.latency_ms} ms` : "-";
+            const warmupMessage = lastWarmup && lastWarmup.message ? String(lastWarmup.message) : "-";
+            llmDebugInfoEl.value = [
+              `Tier: ${tier}`,
+              `Recommended Profile: ${recommendedProfile}`,
+              `Installed Models: ${installedCount}`,
+              `Last Provider: ${activityProvider}`,
+              `Last Latency: ${lastLatency}`,
+              `Warmup: ${warmupMessage}`
+            ].join("\n");
+          }else{
+            llmHealthInfoEl.value = "Health lokal tidak tersedia";
+            llmDebugInfoEl.value = "Debug lokal tidak tersedia";
+          }
 
           if(mode === "local"){
             llmInfoEl.value = ollamaOk ? `Ollama OK (${ollamaModel})` : "Ollama tidak terdeteksi (fallback)";
@@ -671,6 +802,10 @@
           llmInfoEl.value = ollamaOk ? `Auto: Ollama OK (${ollamaModel})` : (apiKeyOk ? `Auto: API OK (${apiModel})` : "Auto: tidak ada LLM (fallback)");
         }catch(e){
           llmInfoEl.value = "LLM info tidak tersedia";
+          llmProfileInfoEl.value = "Profile info tidak tersedia";
+          llmModelInfoEl.value = "Model info tidak tersedia";
+          llmHealthInfoEl.value = "Health lokal tidak tersedia";
+          llmDebugInfoEl.value = "Debug lokal tidak tersedia";
         }
       }
 
@@ -768,7 +903,9 @@
             student_id: getStudentId(),
             content,
             language: getLanguage(),
-            llm_mode: getLlmMode()
+            llm_mode: getLlmMode(),
+            llm_profile: getLlmProfile(),
+            llm_model: getLlmModel()
           };
           const r = await apiPostJson("/api/skills/language-tutor/chat", payload);
           const assistant = r.assistant_message || r.response || r.message || "";
@@ -889,6 +1026,18 @@
       });
       if(llmModeEl){
         llmModeEl.addEventListener("change", () => {
+          setLeftStatus("good","Siap");
+          refreshLlmStatus().catch(()=>{});
+        });
+      }
+      if(llmProfileEl){
+        llmProfileEl.addEventListener("change", () => {
+          setLeftStatus("good","Siap");
+          refreshLlmStatus().catch(()=>{});
+        });
+      }
+      if(llmModelEl){
+        llmModelEl.addEventListener("change", () => {
           setLeftStatus("good","Siap");
           refreshLlmStatus().catch(()=>{});
         });

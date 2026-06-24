@@ -1,0 +1,24 @@
+model:
+  name: "Qwen2.5-7B-Instruct"
+  family: "qwen2.5"
+  role: "primary_base_model"
+  target_product: "PANDAI-Tutor-7B"
+
+tokenizer:
+  use_fast: true
+  trust_remote_code: false
+
+data:
+  dataset_name: "pandai_tutor_v1"
+  train_split: "train"
+  validation_split: "validation"
+  test_split: "test"
+
+runtime:
+  precision: "bf16"
+  gradient_checkpointing: true
+  flash_attention: false
+
+notes:
+  - "Base config awal untuk eksperimen PANDAI-Tutor-7B."
+  - "Sesuaikan precision dan attention backend dengan hardware training."

@@ -1,0 +1,38 @@
+experiment:
+  name: "pandai_tutor_sft_v1"
+  objective: "bilingual_instruction_tuning"
+  output_dir: "model_build/artifacts/checkpoints/pandai_tutor_sft_v1"
+
+base_model:
+  config_path: "model_build/configs/base/qwen25_7b_base.yaml"
+
+lora:
+  enabled: true
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+training:
+  num_train_epochs: 3
+  learning_rate: 0.0002
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  max_seq_length: 2048
+
+evaluation:
+  run_validation: true
+  validation_steps: 200
+  save_steps: 200
+
+notes:
+  - "Template awal. Nilai training harus divalidasi lagi sebelum training sungguhan."
